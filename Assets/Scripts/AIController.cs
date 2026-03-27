@@ -29,9 +29,28 @@ public class AIController : MonoBehaviour
 
 
     // Add State Machine code Here
+    public StateMachine StateMachine { get; private set; }
 
+    void Start()
+    {
+        Agent = GetComponent<NavMeshAgent>();
+        aiAnimationController = GetComponent<AIAnimationController>();
 
-    
+        StateMachine = new StateMachine();
+        StateMachine.AddState(new IdleState(this));
+        StateMachine.AddState(new PatrolState(this));
+        StateMachine.AddState(new ChaseState(this));
+        StateMachine.AddState(new AttackState(this));
+
+        StateMachine.TransitionToState(StateType.Idle);
+    }
+
+    void Update()
+    {
+        StateMachine.Update();
+        currentState = StateMachine.GetCurrentStateType();
+    }
+
     // 
     public bool CanSeePlayer()
     {
@@ -120,5 +139,4 @@ public class AIController : MonoBehaviour
         Gizmos.DrawLine(transform.position, transform.position + leftBoundary * viewDistance);
         Gizmos.DrawLine(transform.position, transform.position + rightBoundary * viewDistance);
     }
-
 }
